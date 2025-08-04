@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guess the Number</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+    <!--Main Container-->
+    <div class="bg-white p-8 rounded-2xl shadow-xl text-center sm:p-12 max-w-lg w-full">
+        <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">Guess the Number</h1>
+        <p class="text-gray-600 mb-6 sm:mb-8">I have a secret number between 1 and 100. Can you guess it?</p>
+        <!--user input and guess button-->
+        <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-6">
+            <input
+                type="number"
+                id="guessInput"
+                class="w-full sm:w-auto px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg text-center"
+                placeholder="Enter your guess..."
+                min="1"
+                max="100"
+            />
+            <button id="guessButton" class="w-full sm:w-auto bg-blue-600 hower:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl shadow-md transition duration-200 transform hover:scale-105">Guess</button> 
+        </div>
+
+
+        <!--Game feedback and attempt counter-->
+        <div id="messageBox" class="bg-blue-50 p-4 rounded-xl text-blue-800 font-medium mb-4 transition-all duration-300 transform scale-0">
+            <!--Message will be displayed here-->
+        </div>
+
+        <div class="text-gray-500 mb-6">
+            <p id="attempts"></p>
+        </div>
+
+
+        <!--New Game button(Initially hidden)-->
+        <button 
+            id="newGameButton"
+            class=" w-full sm:w-auto bg-green-600 hower:bg-green-700 text-white font-bold py-3 px-8 rounded-xl shadow-xl shadow-md transition duration-200 transform hover:scale-105"
+        >
+            Play Again
+        </button>
+    </div>
+
+    <script>
+        //Waiting for the DOM to be fully loaded before rnnning script
+        document.addEventListener("DOMContentLoaded",()=>{
+            //Get all the necessary DOM elements
+            const guessInput=document.getElementById('guessInput');
+            const guessButton=document.getElementById('guessButton');
+            const newGameButton=document.getElementById('newGameButton');
+            const messageBox=document.getElementById('messageBox');
+            const attemptsDisplay=document.getElementById('attempts');
+            //Declare Global variables for game state
+            let randomNumber;
+            let attempts=0;
+            //Functions to initialize or reset the game
+            const startGame=()=>{
+                //Generate a new number
+                randomNumber=Math.floor(Math.random() * 100)+1
+                //reseting attempts
+                attempts=0;
+                //Reset the UI
+                messageBox.textContent="";
+                messageBox.classList.remove("scale-0");
+                attemptsDisplay.textContent="Attempts:0";
+                guessInput.value="";
+                guessInput.disabled=false;
+                guessButton.disabled=false;
+                guessButton.classList.remove('hidden');
+                newGameButton.classList.add("hidden");
+                console.log('New game started. Secret number is : ',randomNumber);
+            };
+            //Function to handle the user guess
+            const checkGuess=()=>{
+                // Get the user's guess from the input field
+                const userGuess = parseInt(guessInput.value, 10);
+
+                // Basic input validation
+                if (isNaN(userGuess) || userGuess < 1 || userGuess > 100) {
+                    showMessage('Please enter a valid number between 1 and 100.', 'bg-red-100 text-red-800');
+                    return; // Exit the function if input is invalid
+                }
+
+                // Increment the attempts counter
+                attempts++;
+                attemptsDisplay.textContent = `Attempts: ${attempts}`;
+
+                // Compare the guess with the random number
+                if (userGuess === randomNumber) {
+                    showMessage(`Congratulations! You guessed the number in ${attempts} attempts!`, 'bg-green-100 text-green-800');
+                    // Disable the guess button and show the new game button
+                    guessInput.disabled = true;
+                    guessButton.disabled = true;
+                    newGameButton.classList.remove('hidden');
+                } else if (userGuess > randomNumber) {
+                    showMessage('Too high! Try a lower number.', 'bg-yellow-100 text-yellow-800');
+                } else {
+                    showMessage('Too low! Try a higher number.', 'bg-yellow-100 text-yellow-800');
+                }
+
+                // Clear the input field for the next guess
+                guessInput.value = '';
+            };
+            //Function to show a message in message box
+            const showMessage=(message, styleClasses)=>{
+                // First, remove previous style classes
+                messageBox.className = 'p-4 rounded-xl font-medium mb-4 transition-all duration-300 transform scale-100';
+                // Then, add the new style classes
+                messageBox.classList.add(...styleClasses.split(' '));
+                messageBox.textContent = message;
+            };
+            //Add event listeners
+            guessButton.addEventListener("click",checkGuess);
+            newGameButton.addEventListener("click",startGame);
+            //Also allow the user to press Enter tosubmit their guess
+            guessInput.addEventListener("keydown",(event)=>{
+                if(event.key === 'Enter'){
+                    checkGuess();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
